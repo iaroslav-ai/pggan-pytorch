@@ -10,7 +10,7 @@ import torchvision.transforms as transforms
 from torch.autograd import Variable
 from PIL import Image
 import copy
-from torch.nn.init import kaiming_normal, calculate_gain
+from torch.nn.init import kaiming_normal, calculate_gain, xavier_normal
 
 # same function as ConcatTable container in Torch7.
 class ConcatTable(nn.Module):
@@ -67,19 +67,19 @@ class minibatch_std_concat_layer(nn.Module):
             vals = torch.mean(vals, dim=1, keepdim=True)
         elif self.averaging == 'spatial':
             if len(shape) == 4:
-                vals = mean(vals, axis=[2,3], keepdim=True)             # torch.mean(torch.mean(vals, 2, keepdim=True), 3, keepdim=True)
+                vals = torch.mean(vals, axis=[2,3], keepdim=True)             # torch.mean(torch.mean(vals, 2, keepdim=True), 3, keepdim=True)
         elif self.averaging == 'none':
             target_shape = [target_shape[0]] + [s for s in target_shape[1:]]
         elif self.averaging == 'gpool':
             if len(shape) == 4:
-                vals = mean(x, [0,2,3], keepdim=True)                   # torch.mean(torch.mean(torch.mean(x, 2, keepdim=True), 3, keepdim=True), 0, keepdim=True)
+                vals = torch.mean(x, [0,2,3], keepdim=True)                   # torch.mean(torch.mean(torch.mean(x, 2, keepdim=True), 3, keepdim=True), 0, keepdim=True)
         elif self.averaging == 'flat':
             target_shape[1] = 1
             vals = torch.FloatTensor([self.adjusted_std(x)])
         else:                                                           # self.averaging == 'group'
             target_shape[1] = self.n
             vals = vals.view(self.n, self.shape[1]/self.n, self.shape[2], self.shape[3])
-            vals = mean(vals, axis=0, keepdim=True).view(1, self.n, 1, 1)
+            vals = torch.mean(vals, axis=0, keepdim=True).view(1, self.n, 1, 1)
         vals = vals.expand(*target_shape)
         return torch.cat([x, vals], 1)
 

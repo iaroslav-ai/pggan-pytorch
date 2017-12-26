@@ -63,7 +63,7 @@ def load_model(net, path):
 def save_model(net, path):
     torch.save(net.state_dict(), path)
 
-
+"""
 def make_summary(writer, key, value, step):
     if hasattr(value, '__len__'):
         for idx, img in enumerate(value):
@@ -77,6 +77,7 @@ def make_summary(writer, key, value, step):
         summary = tf.Summary(value=[tf.Summary.Value(tag=key, simple_value=value)])
         writer.add_summary(summary, global_step=step)
 
+"""
 
 
 
